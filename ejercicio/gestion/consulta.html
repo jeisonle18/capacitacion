@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Consulta | Libros</title>
+    <title>Consultar | Libros</title>
 
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/fontawesome-all.min.css">
@@ -15,20 +15,21 @@
     <div class="container-fluid">
         <h1 class="text-center mt-4 mb-4">Consulta De Libros</h1>
         <div class="container mb-4 text-right">
-            <a href="registro.html" class="mr-3"><i class="fas fa-user-plus"></i> Registrar Libro</a> |
+            <a href="registro.html" class="mr-3"><i class="fas fa-user-plus"></i> Registrar Libro</a> 
+            <a href="index.html" class="ml-3"><i class="fas fa-home"></i> Registrar Autor</a>
             <a href="index.html" class="ml-3"><i class="fas fa-home"></i> Volver al Inicio</a>
         </div>
 
         <div class="container">
-            <table id="tblUsuarios" class="table table-striped">
+            <table id="tblLibros" class="table table-striped">
                 <thead>
                     <tr>
                         <th id="thNombre">Nombre</th>
-                        <th id="thApellidos">Autor</th>
-                        <th id="thDocumento">Precio</th>
-                        <th id="thTipoDoc">Portada</th>
-                        <th id="thCelular">Cantidad</th>
-                        <th id="thNacionalidad">Estado</th>
+                        <th id="thAutor">Autor</th>
+                        <th id="thPrecio">Precio</th>
+                        <th id="thPortada">Portada</th>
+                        <th id="thCantidad">Cantidad</th>
+                        <th id="thEstado">Estado</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -38,8 +39,6 @@
         </div>
     </div>
 
-
-  
 <!-- Modal -->
 <div class="modal fade" id="btnModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -51,32 +50,45 @@
         </button>
       </div>
       <div class="modal-body">
-        ...
+       
+            <table id="tblLibros" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th id="thNombre">Nombre</th>
+                        <th id="thAutor">Autor</th>
+                        <th id="thPrecio">Precio</th>
+                        <th id="thPortada">Portada</th>
+                        <th id="thCantidad">Cantidad</th>
+                        <th id="thEstado">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-        <button type="button" class="btn btn-primary">Save Changes</button>
+        <button type="button" class="btn btn-primary">Editar Libro</button>
       </div>
     </div>
   </div>
 </div>    
 
-
-    <script id="template-usuarios" type="text/x-handlebars-template">
-        {{#each usuarios}}
+    <script id="template-libros" type="text/x-handlebars-template">
+        {{#each libros}}
         <tr>
             <td headers="thNombre">{{this.nombre}}</td>
-            <td headers="thApellidos">{{this.apellidos}}</td>
-            <td headers="thTipoDoc">{{this.tipoDoc}}</td>
-            <td headers="thDocumento">{{this.documento}}</td>
+            <td headers="thAutor">{{this.autor.nombre}}</td>
+            <td headers="thPrecio">{{this.precio}}</td>
+            <td headers="thPortada">{{this.portada}}</td>
 
-            {{#if this.celular}}
-            <td headers="thCelular">{{this.celular}}</td>
+            {{#if this.cantidad}}
+            <td headers="thCantidad">{{this.cantidad}}</td>
             {{else}}
-            <td headers="thCelular">N/A</td>
+            <td headers="thCantidad">N/A</td>
             {{/if}}
 
-            <td headers="thNacionalidad">{{this.nacionalidad}}</td>
+            <td headers="thEstado">{{this.estado}}</td>
             <td headers=<button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#btnModal">
                 Ver Detalle
             </button></td>
@@ -89,64 +101,52 @@
     <script src="js/handlebars.min-v4.0.11.js"></script>
     <script>
 
-        var tblUsuarios = $('#tblUsuarios');
-        var tbody = tblUsuarios.find('tbody');
 
-        //Se busca el template y se obtiene el HTML como un String
-        var source   = document.getElementById("template-usuarios").innerHTML;
-        //En caso de querer hacer esto con jQuery
-        //var source = $('#template-usuarios').html();
+        (function(){
 
-        //renderFilas, es una función que reemplaza el texto en el template y retorna un string formateado
-        var renderFilas = Handlebars.compile(source);
+            var tblLibros = $('#tblLibros');
+            var tbody = tblLibros.find('tbody');
+            var source   = document.getElementById("template-libros").innerHTML;
+            //var source = $('#template-usuarios').html();
+            var renderFilas = Handlebars.compile(source);
 
-        function cargarUsuarios(){
-            tbody.empty(); // || tbody.html('');  // cualquiera de las dos formas limpia el contenido
-            var usuarios = sessionStorage.getItem('usuarios'); //String
-            if (usuarios.length === 0){
-                mostrarMensajeSinDatos();
-                return false;
+
+            function init(){
+                consultarLibros();
             }
 
-            usuarios = JSON.parse(usuarios); //Object || Array
-            if (!Array.isArray(usuarios)){  //Valida que el parametro usuarios sea un arreglo
-                mostrarMensajeSinDatos();
-                return false;
+            function consultarLibros(){
+                $.ajax({
+                    url:'http://localhost:5000/libros/consultar',
+                    type:'GET',
+                    dataType:'json',
+                    success:cargarLibros,
+                    error:function(err){
+                        console.error(err);
+                    }
+                });
             }
 
-            ///Render de las filas con Handlebars
-            tbody.append( renderFilas({usuarios:usuarios}) );
+            function cargarLibros(respuesta){
+                tbody.empty();
+                var libros = respuesta.data;
+                if (libros.length === 0){
+                    mostrarMensajeSinDatos();
+                    return false;
+                }
+                tbody.append( renderFilas({libros:libros}) );
 
-            /*
-             ///Render de las filas con jQuery
-            for (var i in usuarios){
-                var usuario = usuarios[i];
-                tbody.append( crearFila(usuario) );
             }
-            */
 
-        }
-
-        function mostrarMensajeSinDatos(){
-            console.log('No hay registros');
-        }
-
-//        function crearFila(usuario){
-//            var tr = $('<tr>');
-//            var tdNombre = $('<td>')
-//                                .attr('headers', 'thNombre')
-//                                .text(usuario.nombre);
-//
-//            var tdApellidos = $('<td>').attr('headers', 'thApellidos').text(usuario.apellidos);
-//            var tdTipoDoc = $('<td>').attr('headers', 'thTipoDoc').text(usuario.tipoDoc);
-//            var tdDocumento = $('<td>').attr('headers', 'thDocumento').text(usuario.documento);
-//            var tdNacionalidad = $('<td>').attr('headers', 'thNacionalidad').text(usuario.nacionalidad);
-//            tr.append(tdNombre, tdApellidos, tdDocumento, tdNacionalidad);
-//            return tr;
-//        }
+            function mostrarMensajeSinDatos(){
+                console.log('No hay registro de Libros');
+            }
 
 
-        cargarUsuarios();
+            init();
+
+        })();
+
 
     </script>
 

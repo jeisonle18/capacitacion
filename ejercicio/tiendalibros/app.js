@@ -61,7 +61,10 @@ function registrarLibro(req, res){
 function registrarAutor(req, res){
     var autores = db.collection('autores');
     var nuevoAutor = {
-        nombre: req.body.nombre
+        nombreautor:req.body.nombreautor,
+        cantidad:req.body.cantidad,
+        estado:req.body.estado,
+        observaciones:req.body.observaciones
     };
     autores.insertOne(nuevoAutor, function(err, resultado){
         if (err) { return validarError(res, err, 'Ocurrió un error al registrar el autor') }
@@ -71,15 +74,27 @@ function registrarAutor(req, res){
 
 
 function consultarLibros(req, res){
-	var libros = db.collection('libros');
-	var opciones = {
-        collation:{locale:'es'},
-		sort:{'precio': -1, 'nombre': 1}
-	};
-	libros.find({}, opciones).toArray(function(err, data){
-        if (err) { return validarError(res, err, 'Ocurrió un error al consultar los libros') }
-        res.send(construirRespuestaDatos(data, 'Libros encontrados'));
-	});
+    var libros = db.collection('libros');
+    libros.aggregate(
+        [ 
+            { 
+                '$lookup': { 
+                    from: "autores",
+                    localField: "autor",
+                    foreignField: "_id",
+                    as: "autor"
+                },
+            },
+            { "$unwind": "$autor" },
+            { $sort:{'precio': -1, 'nombre': 1} }
+        ], 
+    function(err, cursor) {
+        cursor.toArray(function(err, documents) {
+            if (err) { return validarError(res, err, 'Ocurrió un error al consultar los libros') }
+            res.send(construirRespuestaDatos(documents, 'Libros encontrados'));
+        });
+      }
+  );
 }
 
 

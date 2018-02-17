@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Formulario Registro Libros</title>
+    <title>Registrar | Autor</title>
 
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/fontawesome-all.min.css">
@@ -22,9 +22,11 @@
 
 <div class="container-fluid">
     <div class="container text-center mt-5 pb-2">
-        <h1 class="mt-4 mb-4 text-center">Registro de Libros</h1>
+        <h1 class="mt-4 mb-4 text-center">Registrar Libros</h1>
         <div class="container mb-2 text-right">
-            <a href="consulta.html" class="mr-3"><i class="fas fa-address-book"></i> Consultar Libros</a> 
+            <a href="registro.html" class="btn btn-link"><i class="fas fa-user-plus"></i> Registrar Libro</a>
+            <a href="resumen_pago.html" class="btn btn-link"><i class="fas fa-address-book"></i> Catalogo Libros</a>
+            <a href="autores.html" class="ml-3"><i class="fas fa-home"></i> Registrar Autor</a>
             <a href="index.html" class="ml-3"><i class="fas fa-home"></i> Volver al Inicio</a>
         </div>
     </div>
@@ -33,21 +35,10 @@
         <div class="row">
 
             <div class="form-group col-md-4">
-                <label for="txtNombre">Nombre:</label>
+                <label for="txtNombreautor">Nombre Autor:</label>
                 <input type="text" class="form-control" id="txtNombre" required>
             </div>
-             <div class="form-group col-md-4">
-                <label for="txtAutor">Autor:</label>
-                <select id="cmbAutor" class="form-control" required></select>
-            </div>        
-            <div class="form-group col-md-4">
-                <label for="txtPrecio">Precio:</label>
-                <input type="valor" class="form-control" id="txtPrecio" required>
-            </div>
-            <div class="form-group col-md-4">
-                <label for="txtPortada">Portada:</label>
-                <input type="text" class="form-control" id="txtPortada">
-            </div>
+ 
             <div class="form-group col-md-4">
                 <label for="txtCantidad">Cantidad:</label>
                 <input type="text" class="form-control" id="txtCantidad">
@@ -80,19 +71,13 @@
 
 <script>
 
-    //JSON - JavaScript Object Notation
     var Estado = [
         { valor:'Nuevo', nombre:'Nuevo' },
         { valor:'Usado', nombre:'Usado' },
     ];
 
-     var Autor = [
-        { valor:'Nombre', nombre:'Nombre' },
-    ];
-
     function init(){
         cargarComboEstado();
-        cargarComboAutor();
 
         $('#btnGuardar').on('click', function(){
             validarFormulario( $('#formulario') );
@@ -106,8 +91,6 @@
         formulario.find('.is-valid, .is-invalid')
                             .removeClass('is-invalid')
                             .removeClass('is-valid');
-
-        formulario.find('input[type="text"], textarea, input[type="email"]').val('');
         formulario.find('select').val('-1');
     }
 
@@ -135,19 +118,15 @@
             });
             return;
         }
-        //si el formulario está OK, guardar
-        guardarLibro();
+        guardarAutor();
     }
   
-    function guardarLibro() {
+    function guardarAutor() {
         $.ajax({
-         url:'http://localhost:5000/libros/registrar',
+         url:'http://localhost:5000/autores/registrar',
             type:'POST',
             data:{
-            nombre:$('#txtNombre').val(),
-            autor: $('#txtAutor').val(),
-            precio: $('#txtPrecio').val(),
-            portada: $('#txtPortada').val(),
+            nombreautor:$('#txtNombreautor').val(),
             cantidad: $('#txtCantidad').val(),
             estado:  $('#cmbEstado').val(),
             observaciones: $('#txtObservaciones').val()
@@ -171,7 +150,7 @@
     function validarInput(elemento){
         if (elemento.val().trim().length === 0){
             elemento.addClass('is-invalid').removeClass('is-valid');
-            return 'El campo <b>'+obtenerLabel(elemento)+'</b> está vacío. <br/>';
+            return 'El campo <b>'+obtenerLabel(elemento)+'</b> está vacío Favor Validar. <br/>';
         
         }
         elemento.removeClass('is-invalid').addClass('is-valid');
@@ -192,15 +171,9 @@
         $('#cmbEstado').llenarCombo(Estado, 'valor', 'nombre');
     }
 
-    function cargarComboAutor() {
-     
-        $('#cmbAutor').llenarCombo(Autor, 'valor', 'nombre');
-    }
 
     init();
 
 </script>
-
-
 </body>
 </html>

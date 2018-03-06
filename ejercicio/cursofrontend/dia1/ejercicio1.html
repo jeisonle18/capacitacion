@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Ejercicio 1</title>
+
+	<!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+	<style>
+		.btn-enlinea{
+			position: relative;
+			margin-top:30px;
+		}
+	</style>
+</head>
+<body>
+	
+	<div class="container">
+		<div class="row">
+			<div class="form-group col-md-6">
+				<label for="txtCantidad">Cantidad:</label>
+				<input type="text" class="form-control" id="txtCantidad">
+			</div>
+			<div class="form-group col-md-6">
+				<button class="btn btn-danger btn-enlinea" id="btnAgregar">Agregar</button>
+			</div>
+		</div>
+
+		<div id="contenedor">
+			
+		</div>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+
+	<script>
+		var contadorGeneral = 0;
+		$('#btnAgregar').on('click', function () {
+			var cantidad = parseInt($('#txtCantidad').val());
+			for (var i=0; i<cantidad; i++){
+			    $('#contenedor').append(
+			        $('<p>').text('Elemento agregado '+contadorGeneral)
+				);
+			    contadorGeneral++;
+			}
+        });
+	</script>
+</body>
+</html>
